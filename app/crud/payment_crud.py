@@ -66,18 +66,31 @@ Agreement ID: {payment_data.agreement_id}
 Thank You.
 """
 
-    send_email(
-        tenant.email,
-        "Payment Receipt",
-        body
-    )
+    # Try sending email, but don't fail payment if email fails
+    try:
+
+        send_email(
+            tenant.email,
+            "Payment Receipt",
+            body
+        )
+
+        print(f"Email sent successfully to {tenant.email}")
+
+    except Exception as e:
+
+        print("Email failed:", e)
 
     return new_payment
 
 
-def get_payments(db: Session):
+def get_payments(
+    db: Session
+):
 
-    return db.query(Payment).all()
+    return db.query(
+        Payment
+    ).all()
 
 
 def verify_payment_hash(
@@ -92,6 +105,7 @@ def verify_payment_hash(
     ).first()
 
     if payment is None:
+
         return None
 
     current_hash = generate_payment_hash(
