@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.crud.audit_crud import create_audit_log
+
 from app.database import get_db
 from app.schemas import PropertyCreate
-from app.auth.dependencies import get_current_user
 from app.auth.rbac import admin_required
 
 from app.crud.property_crud import (
@@ -13,18 +12,20 @@ from app.crud.property_crud import (
     delete_property
 )
 
+from app.crud.audit_crud import create_audit_log
+
 router = APIRouter(
     prefix="/properties",
     tags=["Properties"]
 )
 
 
-# CREATE PROPERTY (Protected)
+# CREATE PROPERTY
 @router.post("/")
 def add_property(
     property_data: PropertyCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(admin_required)
+    current_user=Depends(admin_required)
 ):
 
     new_property = create_property(
@@ -34,12 +35,14 @@ def add_property(
 
     create_audit_log(
         db,
-        current_user.email,
+        current_user,
         f"Created Property: {new_property.property_name}"
     )
 
     return new_property
-# GET ALL PROPERTIES (Public)
+
+
+# GET ALL PROPERTIES
 @router.get("/")
 def view_properties(
     db: Session = Depends(get_db)
@@ -47,13 +50,13 @@ def view_properties(
     return get_properties(db)
 
 
-# UPDATE PROPERTY (Protected)
+# UPDATE PROPERTY
 @router.put("/{property_id}")
 def edit_property(
     property_id: int,
     property_data: PropertyCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(admin_required)
+    current_user=Depends(admin_required)
 ):
 
     updated_property = update_property(
@@ -68,15 +71,21 @@ def edit_property(
             detail="Property not found"
         )
 
+    create_audit_log(
+        db,
+        current_user,
+        f"Updated Property ID: {property_id}"
+    )
+
     return updated_property
 
 
-# DELETE PROPERTY (Protected)
+# DELETE PROPERTY
 @router.delete("/{property_id}")
 def remove_property(
     property_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(admin_required)
+    current_user=Depends(admin_required)
 ):
 
     deleted_property = delete_property(
@@ -92,7 +101,7 @@ def remove_property(
 
     create_audit_log(
         db,
-        current_user.email,
+        current_user,
         f"Deleted Property ID: {property_id}"
     )
 
@@ -100,10 +109,14 @@ def remove_property(
         "message": "Property deleted successfully"
     }
 
+
+# TEST ADMIN
 @router.get("/test-admin")
 def test_admin(
-    current_user = Depends(admin_required)
+    current_user=Depends(admin_required)
 ):
+
     return {
-        "message": "Admin Access Granted"
+        "message": "Admin Access Granted",
+        "current_user": current_user
     }

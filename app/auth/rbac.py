@@ -7,12 +7,12 @@ from app.models import User
 
 
 def admin_required(
-    email: str = Depends(get_current_user),
+    username: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
 
     user = db.query(User).filter(
-        User.email == email
+        User.username == username
     ).first()
 
     if not user:
