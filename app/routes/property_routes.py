@@ -34,10 +34,10 @@ def add_property(
     )
 
     create_audit_log(
-        db,
-        current_user,
-        f"Created Property: {new_property.property_name}"
-    )
+    db,
+    current_user.email,
+    f"Created Property: {new_property.property_name}"
+)
 
     return new_property
 
@@ -72,10 +72,10 @@ def edit_property(
         )
 
     create_audit_log(
-        db,
-        current_user,
-        f"Updated Property ID: {property_id}"
-    )
+    db,
+    current_user.email,
+    f"Updated Property ID: {property_id}"
+)
 
     return updated_property
 
@@ -100,10 +100,10 @@ def remove_property(
         )
 
     create_audit_log(
-        db,
-        current_user,
-        f"Deleted Property ID: {property_id}"
-    )
+    db,
+    current_user.email,
+    f"Deleted Property ID: {property_id}"
+)
 
     return {
         "message": "Property deleted successfully"
