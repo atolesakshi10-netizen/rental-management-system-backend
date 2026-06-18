@@ -9,6 +9,7 @@ from app.routes import payment_routes
 from app.routes import dashboard_routes
 from app.routes import audit_routes
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes.audit_routes import router as audit_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -18,10 +19,7 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://localhost:3000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -56,6 +54,8 @@ app.include_router(
 app.include_router(
     audit_routes.router
 )
+
+app.include_router(audit_router)
 
 @app.get("/health")
 def health_check():
