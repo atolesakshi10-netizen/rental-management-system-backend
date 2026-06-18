@@ -2,16 +2,22 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.utils.analytics import get_dashboard_data
+from app.models import Property, Tenant, Agreement, Payment
+from app.auth.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/dashboard",
     tags=["Dashboard"]
 )
 
-
-@router.get("/")
-def dashboard(
-    db: Session = Depends(get_db)
+@router.get("/stats")
+def dashboard_stats(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
-    return get_dashboard_data(db)
+    return {
+        "properties": db.query(Property).count(),
+        "tenants": db.query(Tenant).count(),
+        "agreements": db.query(Agreement).count(),
+        "payments": db.query(Payment).count()
+    }

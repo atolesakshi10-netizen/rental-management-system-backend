@@ -10,7 +10,7 @@ from app.routes import dashboard_routes
 from app.routes import audit_routes
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.audit_routes import router as audit_router
-
+from app.routes.dashboard_routes import router as dashboard_router
 # Create tables
 Base.metadata.create_all(bind=engine)
 
@@ -56,6 +56,8 @@ app.include_router(
 )
 
 app.include_router(audit_router)
+
+app.include_router(dashboard_router)
 
 @app.get("/health")
 def health_check():
