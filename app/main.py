@@ -8,12 +8,23 @@ from app.routes import agreement_routes
 from app.routes import payment_routes
 from app.routes import dashboard_routes
 from app.routes import audit_routes
+from fastapi.middleware.cors import CORSMiddleware
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Rental Management System"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://localhost:3000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 app.include_router(auth_router)
